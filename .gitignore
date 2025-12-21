@@ -1,0 +1,22 @@
+# Node
+node_modules/
+
+# Environment
+.env
+
+# Python
+__pycache__/
+venv/
+
+# AI / ML Models (IMPORTANT)
+models/
+*.h5
+*.pkl
+*.pt
+*.onnx
+
+# Uploads
+uploads/
+
+# Logs
+npm-debug.log*
