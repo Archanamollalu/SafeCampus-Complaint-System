@@ -1,3 +1,6 @@
+const { connectToNetwork } = require('../../blockchain/fabricNetwork');
+
+
 const Complaint = require('../models/Complaint');
 const User = require('../models/User');
 const mongoose = require('mongoose');
@@ -58,6 +61,35 @@ exports.createComplaint = async (req, res, next) => {
       status: "pending"
     });
     
+    // 🔗 SEND COMPLAINT TO BLOCKCHAIN
+// 🔗 SEND COMPLAINT TO BLOCKCHAIN
+// 🔗 SEND COMPLAINT TO BLOCKCHAIN
+try {
+  console.log("⛓️ Sending complaint to blockchain...");
+
+  const { contract, gateway } = await connectToNetwork();
+
+  const result = await contract.submitTransaction(
+    'addComplaint',
+    complaint._id.toString(),
+    complaint.severity,
+    complaint.description
+  );
+
+  const blockchainResponse = JSON.parse(result.toString());
+  console.log("✅ Blockchain response:", blockchainResponse);
+
+  complaint.blockchainHash = blockchainResponse.hash;
+  complaint.blockchainTxId = complaint._id.toString();
+  await complaint.save();
+
+  await gateway.disconnect();
+
+} catch (err) {
+  console.error("❌ BLOCKCHAIN FAILED:", err);
+}
+
+
 
     // ==============================
     // 3️⃣ HANDLE FILE UPLOADS

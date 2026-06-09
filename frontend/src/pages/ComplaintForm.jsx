@@ -26,7 +26,6 @@ import {
   ArrowBack,
   Description,
   Category,
-  AttachFile,
   CheckCircle,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -49,7 +48,6 @@ const ComplaintForm = () => {
     category: '',
     description: '',
     department: '',
-    evidence: [],
     contactPreference: 'email',
   });
 
@@ -138,23 +136,8 @@ const ComplaintForm = () => {
         isAnonymous: isAnonymous
       };
 
-      // If there are files, submit as multipart/form-data
-      if (formData.evidence && formData.evidence.length > 0) {
-        const fd = new FormData();
-        fd.append('title', submitData.title);
-        fd.append('category', submitData.category);
-        fd.append('description', submitData.description);
-        fd.append('department', submitData.department);
-        fd.append('contactPreference', submitData.contactPreference);
-        fd.append('isAnonymous', submitData.isAnonymous);
-
-        formData.evidence.forEach((file) => fd.append('evidence', file));
-        // Let axios set the Content-Type with correct boundary for FormData
-        await complaintAPI.create(fd);
-      } else {
-        // No files, send JSON
-        await complaintAPI.create(submitData);
-      }
+      // Send as JSON
+      await complaintAPI.create(submitData);
       enqueueSnackbar('Complaint submitted successfully!', { variant: 'success' });
       navigate('/student/dashboard');
     } catch (error) {
@@ -173,25 +156,6 @@ const ComplaintForm = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length + formData.evidence.length > 5) {
-      enqueueSnackbar('Maximum 5 files allowed', { variant: 'warning' });
-      return;
-    }
-    setFormData({
-      ...formData,
-      evidence: [...formData.evidence, ...files],
-    });
-  };
-
-  const removeFile = (index) => {
-    setFormData({
-      ...formData,
-      evidence: formData.evidence.filter((_, i) => i !== index),
-    });
   };
 
   const renderStepContent = (step) => {
@@ -317,74 +281,6 @@ const ComplaintForm = () => {
                 />
               </Grid>
 
-
-              <Grid item xs={12}>
-                <Card variant="outlined" sx={{ mt: 2 }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                      <AttachFile sx={{ mr: 1 }} />
-                      Attach Evidence (Optional)
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" paragraph>
-                      Upload supporting documents, images, or screenshots (Max 5 files, 5MB each)
-                    </Typography>
-                    
-                    <Box sx={{ mb: 2 }}>
-                      <input
-                        accept="image/*,.pdf,.doc,.docx"
-                        style={{ display: 'none' }}
-                        id="evidence-upload"
-                        multiple
-                        type="file"
-                        onChange={handleFileUpload}
-                      />
-                      <label htmlFor="evidence-upload">
-                        <Button
-                          variant="outlined"
-                          component="span"
-                          startIcon={<AttachFile />}
-                        >
-                          Choose Files
-                        </Button>
-                      </label>
-                    </Box>
-
-                    {formData.evidence.length > 0 && (
-                      <Box>
-                        <Typography variant="subtitle2" gutterBottom>
-                          Selected Files ({formData.evidence.length}/5):
-                        </Typography>
-                        {formData.evidence.map((file, index) => (
-                          <Box
-                            key={index}
-                            sx={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              p: 1,
-                              mb: 1,
-                              bgcolor: 'grey.50',
-                              borderRadius: 1,
-                            }}
-                          >
-                            <Typography variant="body2">
-                              {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                            </Typography>
-                            <Button
-                              size="small"
-                              color="error"
-                              onClick={() => removeFile(index)}
-                            >
-                              Remove
-                            </Button>
-                          </Box>
-                        ))}
-                      </Box>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-
               <Grid item xs={12}>
                 <Alert severity="info" sx={{ mt: 2 }}>
                   <Typography variant="body2">
@@ -446,15 +342,6 @@ const ComplaintForm = () => {
                   </Typography>
                   <Typography variant="body1" paragraph>
                     {formData.description}
-                  </Typography>
-                </Grid>
-                
-                <Grid item xs={12}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Attached Files
-                  </Typography>
-                  <Typography variant="body1">
-                    {formData.evidence.length} file(s) attached
                   </Typography>
                 </Grid>
               </Grid>

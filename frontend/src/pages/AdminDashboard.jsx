@@ -313,7 +313,7 @@ const AdminDashboard = () => {
 
   // Pie chart data for categories
   const categoryData = (stats?.topCategories || []).map(item => ({
-    name: item._id.charAt(0).toUpperCase() + item._id.slice(1),
+    name: item._id ? item._id.charAt(0).toUpperCase() + item._id.slice(1) : 'Unknown',
     value: item.count,
   }));
 
@@ -715,7 +715,7 @@ const AdminDashboard = () => {
                       angle={-45}
                       textAnchor="end"
                       height={60}
-                      tickFormatter={(value) => value.charAt(0).toUpperCase() + value.slice(1)}
+                      tickFormatter={(value) => value ? value.charAt(0).toUpperCase() + value.slice(1) : 'Unknown'}
                     />
                     <YAxis />
                     <Tooltip />

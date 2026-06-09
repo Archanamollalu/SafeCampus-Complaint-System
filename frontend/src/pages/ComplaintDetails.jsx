@@ -170,11 +170,6 @@ const ComplaintDetails = () => {
     }
   };
 
-  const downloadFile = (file) => {
-    // Implement file download logic
-    window.open(file.path, '_blank');
-  };
-
   if (loading) {
     return (
       <Container maxWidth="lg" sx={{ py: 8, textAlign: 'center' }}>
@@ -403,44 +398,6 @@ const ComplaintDetails = () => {
             </Grid>
           </Paper>
 
-          {/* Attachments */}
-          {complaint.evidence && complaint.evidence.length > 0 && (
-            <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
-              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                <AttachFile sx={{ mr: 1 }} />
-                Attachments ({complaint.evidence.length})
-              </Typography>
-              <Grid container spacing={2}>
-                {complaint.evidence.map((file, index) => (
-                  <Grid item xs={12} sm={6} md={4} key={index}>
-                    <Card variant="outlined">
-                      <CardContent sx={{ p: 2 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <AttachFile />
-                          <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                            <Typography variant="body2" noWrap>
-                              {file.originalname}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {(file.size / 1024 / 1024).toFixed(2)} MB
-                            </Typography>
-                          </Box>
-                          <IconButton
-                            size="small"
-                            onClick={() => downloadFile(file)}
-                            title="Download"
-                          >
-                            <Download fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            </Paper>
-          )}
-
           {/* Responses */}
           <Paper sx={{ p: 3, borderRadius: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -530,50 +487,47 @@ const ComplaintDetails = () => {
           )}
 
           {/* Blockchain Info */}
-          <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Blockchain Verification
-            </Typography>
-            <Alert severity="success" sx={{ mb: 2 }}>
-              <Typography variant="body2">
-                This complaint is secured using blockchain technology.
+          {complaint.blockchainHash && (
+            <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Blockchain Verification
               </Typography>
-            </Alert>
-            
-            {complaint.blockchainHash ? (
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  Transaction Hash:
-                </Typography>
-                <Typography variant="body2" sx={{ 
-                  fontFamily: 'monospace',
-                  wordBreak: 'break-all',
-                  bgcolor: 'grey.50',
-                  p: 1,
-                  borderRadius: 1,
-                  mt: 0.5,
-                }}>
-                  {complaint.blockchainHash}
-                </Typography>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  sx={{ mt: 2 }}
-                  onClick={() => {
-                    // View on blockchain explorer
-                  }}
-                >
-                  View on Blockchain
-                </Button>
-              </Box>
-            ) : (
-              <Alert severity="warning">
+              
+              <Alert severity="success" sx={{ mb: 2 }}>
                 <Typography variant="body2">
-                  Pending blockchain verification. Will be secured once processed.
+                  ✓ This complaint is secured using blockchain technology and verified.
                 </Typography>
               </Alert>
-            )}
-          </Paper>
+              
+              {isAdminStaff && (
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    Transaction Hash:
+                  </Typography>
+                  <Typography variant="body2" sx={{ 
+                    fontFamily: 'monospace',
+                    wordBreak: 'break-all',
+                    bgcolor: 'grey.50',
+                    p: 1,
+                    borderRadius: 1,
+                    mt: 0.5,
+                  }}>
+                    {complaint.blockchainHash}
+                  </Typography>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    sx={{ mt: 2 }}
+                    onClick={() => {
+                      // View on blockchain explorer
+                    }}
+                  >
+                    View on Blockchain
+                  </Button>
+                </Box>
+              )}
+            </Paper>
+          )}
 
           {/* Feedback */}
           {complaint.feedback && (
