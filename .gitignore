@@ -14,3 +14,6 @@ Thumbs.db
 # Build
 dist/
 build/
+
+*.safetensors
+venv/
